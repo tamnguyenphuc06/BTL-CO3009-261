@@ -1,0 +1,19 @@
+# Thư mục biên dịch sinh ra bởi CubeIDE / GCC ARM
+Debug/
+Release/
+
+# Các file đối tượng và liên kết phụ thuộc
+*.o
+*.d
+*.su
+
+# File nhị phân và file map bộ nhớ
+*.elf
+*.bin
+*.hex
+*.map
+
+# Thư mục cấu hình workspace và metadata của Eclipse/CubeIDE
+.metadata/
+.settings/
+*.launch
