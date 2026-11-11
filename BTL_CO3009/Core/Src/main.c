@@ -22,7 +22,19 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+/* USER CODE BEGIN Includes */
+/* USER CODE BEGIN Includes */
+/* USER CODE BEGIN Includes */
+#include "global.h"
+#include "scheduler.h"
+#include "button.h"
+#include "traffic_light.h"
+#include "fsm_automatic.h"
+#include "fsm_manual.h"
+#include "fsm_tuning.h"
+/* USER CODE END Includes */
+/* USER CODE END Includes */
+/* USER CODE END Includes */
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,7 +74,40 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/* USER CODE BEGIN 0 */
+void System_FSM_Run(void) {
+    // Xử lý chuyển chế độ bằng BTN_1
+    if (Is_Button_Pressed(BTN_INDEX_1)) {
+        switch (current_mode) {
+            case MODE_AUTOMATIC:
+                current_mode = MODE_MANUAL;
+                FSM_Manual_Init();
+                break;
+            case MODE_MANUAL:
+                current_mode = MODE_TUNING;
+                FSM_Tuning_Init();
+                break;
+            case MODE_TUNING:
+                current_mode = MODE_AUTOMATIC;
+                FSM_Automatic_Init();
+                break;
+        }
+    }
 
+    // Thực thi FSM tương ứng với chế độ hiện tại
+    switch (current_mode) {
+        case MODE_AUTOMATIC:
+            FSM_Automatic_Run();
+            break;
+        case MODE_MANUAL:
+            FSM_Manual_Run();
+            break;
+        case MODE_TUNING:
+            FSM_Tuning_Run();
+            break;
+    }
+}
+/* USER CODE END 0 */
 /* USER CODE END 0 */
 
 /**
@@ -97,13 +142,26 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  Global_Init();
+  Button_Init();
+  TrafficLight_Init();
+  FSM_Automatic_Init();
+  SCH_Init();
 
+  // Đọc nút nhấn mỗi 10ms
+  SCH_Add_Task(Button_Reading, 0, 1);
+
+  // Chạy FSM mỗi 10ms
+  SCH_Add_Task(System_FSM_Run, 0, 1);
+
+  HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  SCH_Dispatch_Tasks();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -326,7 +384,13 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+/* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+    if (htim->Instance == TIM2) {
+        SCH_Update();
+    }
+}
+/* USER CODE END 4 */
 /* USER CODE END 4 */
 
 /**
