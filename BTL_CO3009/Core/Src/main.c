@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 /* USER CODE BEGIN Includes */
 /* USER CODE BEGIN Includes */
+/* USER CODE BEGIN Includes */
 #include "global.h"
 #include "scheduler.h"
 #include "button.h"
@@ -32,6 +33,9 @@
 #include "fsm_automatic.h"
 #include "fsm_manual.h"
 #include "fsm_tuning.h"
+#include "lcd.h"
+#include "dht20.h"
+/* USER CODE END Includes */
 /* USER CODE END Includes */
 /* USER CODE END Includes */
 /* USER CODE END Includes */
@@ -145,14 +149,24 @@ int main(void)
   Global_Init();
   Button_Init();
   TrafficLight_Init();
+  lcd_init();
+  dht20_init();
+  dht20_read(value_x10); // Đọc giá trị cảm biến lần đầu khi khởi động
+
   FSM_Automatic_Init();
   SCH_Init();
 
-  // Đọc nút nhấn mỗi 10ms
+  // 1. Quét nút nhấn mỗi 10ms (1 tick)
   SCH_Add_Task(Button_Reading, 0, 1);
 
-  // Chạy FSM mỗi 10ms
+  // 2. Chạy máy trạng thái đèn giao thông mỗi 10ms (1 tick)
   SCH_Add_Task(System_FSM_Run, 0, 1);
+
+  // 3. Tiến trình đọc cảm biến DHT20 mỗi 100ms (10 ticks)
+  SCH_Add_Task(DHT20_Task_Run, 10, 10);
+
+  // 4. Cập nhật màn hình LCD mỗi 250ms (25 ticks)
+  SCH_Add_Task(LCD_Task_Run, 5, 25);
 
   HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
