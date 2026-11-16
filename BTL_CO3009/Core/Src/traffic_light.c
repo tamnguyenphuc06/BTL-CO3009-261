@@ -20,15 +20,15 @@ void TrafficLight_Set(WayIndex_t way, LightState_t state) {
     }
 
     switch (state) {
-        case TL_RED:
+        case TL_GREEN:
             HAL_GPIO_WritePin(port_a, pin_a, GPIO_PIN_SET);
             HAL_GPIO_WritePin(port_b, pin_b, GPIO_PIN_RESET);
             break;
-        case TL_GREEN:
+        case TL_YELLOW:
             HAL_GPIO_WritePin(port_a, pin_a, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(port_b, pin_b, GPIO_PIN_SET);
             break;
-        case TL_YELLOW:
+        case TL_RED:
             HAL_GPIO_WritePin(port_a, pin_a, GPIO_PIN_SET);
             HAL_GPIO_WritePin(port_b, pin_b, GPIO_PIN_SET);
             break;

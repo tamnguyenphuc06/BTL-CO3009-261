@@ -22,10 +22,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-/* USER CODE BEGIN Includes */
-/* USER CODE BEGIN Includes */
-/* USER CODE BEGIN Includes */
-/* USER CODE BEGIN Includes */
 #include "global.h"
 #include "scheduler.h"
 #include "button.h"
@@ -35,10 +31,6 @@
 #include "fsm_tuning.h"
 #include "lcd.h"
 #include "dht20.h"
-/* USER CODE END Includes */
-/* USER CODE END Includes */
-/* USER CODE END Includes */
-/* USER CODE END Includes */
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,7 +55,7 @@ TIM_HandleTypeDef htim2;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+volatile HAL_StatusTypeDef lcd_ack_21;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -77,7 +69,6 @@ static void MX_TIM2_Init(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
 /* USER CODE BEGIN 0 */
 void System_FSM_Run(void) {
     // Xử lý chuyển chế độ bằng BTN_1
@@ -111,7 +102,6 @@ void System_FSM_Run(void) {
             break;
     }
 }
-/* USER CODE END 0 */
 /* USER CODE END 0 */
 
 /**
@@ -149,23 +139,24 @@ int main(void)
   Global_Init();
   Button_Init();
   TrafficLight_Init();
+  lcd_ack_21 = HAL_I2C_IsDeviceReady(&hi2c1, 0x21 << 1, 2, 20);
   lcd_init();
   dht20_init();
-  dht20_read(value_x10); // Đọc giá trị cảm biến lần đầu khi khởi động
+
 
   FSM_Automatic_Init();
   SCH_Init();
 
-  // 1. Quét nút nhấn mỗi 10ms (1 tick)
+  // 1. Quét nút nhấn mỗi 10ms
   SCH_Add_Task(Button_Reading, 0, 1);
 
-  // 2. Chạy máy trạng thái đèn giao thông mỗi 10ms (1 tick)
+  // 2. Chạy máy trạng thái đèn giao thông mỗi 10ms
   SCH_Add_Task(System_FSM_Run, 0, 1);
 
-  // 3. Tiến trình đọc cảm biến DHT20 mỗi 100ms (10 ticks)
+  // 3. Tiến trình đọc cảm biến DHT20 mỗi 100ms
   SCH_Add_Task(DHT20_Task_Run, 10, 10);
 
-  // 4. Cập nhật màn hình LCD mỗi 250ms (25 ticks)
+  // 4. Cập nhật màn hình LCD mỗi 250ms
   SCH_Add_Task(LCD_Task_Run, 5, 25);
 
   HAL_TIM_Base_Start_IT(&htim2);
@@ -398,13 +389,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-/* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM2) {
         SCH_Update();
     }
 }
-/* USER CODE END 4 */
 /* USER CODE END 4 */
 
 /**
