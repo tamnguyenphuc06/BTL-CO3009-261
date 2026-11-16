@@ -10,7 +10,6 @@ static uint16_t time_out_for_key_press[NUM_BUTTONS];
 static uint8_t  flag_for_button_press[NUM_BUTTONS];
 static uint8_t  flag_for_button_hold[NUM_BUTTONS];
 
-// Bảng tra chân GPIO phần cứng đã cấu hình trong CubeMX
 static GPIO_TypeDef* BTN_PORTS[NUM_BUTTONS] = {
     BTN_1_GPIO_Port,
     BTN_2_GPIO_Port,
