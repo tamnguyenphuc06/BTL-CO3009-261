@@ -14,7 +14,7 @@ void FSM_Tuning_Init(void) {
 }
 
 void FSM_Tuning_Run(void) {
-    // 1. Nhấp nháy đèn tương ứng ở tần số 2Hz (toggle mỗi 250ms = 25 ticks)
+    // 1. Nhấp nháy đèn tương ứng ở tần số 2Hz
     blink_counter++;
     if (blink_counter >= 25) {
         blink_counter = 0;
